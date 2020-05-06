@@ -14,6 +14,10 @@ tempReadings = parts.map(lambda p: Row(station=p[0], date=p[1], year=p[1].split(
 schemaTempReadings = sqlContext.createDataFrame(tempReadings)
 schemaTempReadings.registerTempTable("tempReadings")
 
-schemaTempReadingsMin = schemaTempReadings.groupBy('year').agg(F.min('value').alias('dailymin')).orderBy(['year'], ascending = [1]).show()
-schemaTempReadingsMax = schemaTempReadings.groupBy('year').agg(F.max('value').alias('dailymax'))
+schemaTempReadingsMin = schemaTempReadings.groupBy('year').agg(F.min('value').alias('value'))
+schemaTempReadingsMax = schemaTempReadings.groupBy('year').agg(F.max('value').alias('value'))
+
+totalMinTemp = schemaTempReadingsMin.join(schemaTempReadings, ['year', 'value'], 'inner').select('year', 'value', 'station').orderBy(['value'], ascending = [1]).show(100)
+totalMaxTemp = schemaTempReadingsMax.join(schemaTempReadings, ['year', 'value'], 'inner').select('year', 'value', 'station').orderBy(['value'], ascending = [1]).show(100)
+
 
