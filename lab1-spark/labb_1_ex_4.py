@@ -1,4 +1,3 @@
-
 from pyspark import SparkContext
 
 sc = SparkContext(appName = "exercise 1")
@@ -11,7 +10,10 @@ lines_pre = precipitation_file.map(lambda line: line.split(";"))
 station_temperature = lines_temp.map(lambda x: (x[0],float(x[3])))
 station_precipitation = lines_pre.map(lambda x: (x[0], float(x[3])))
 
-#filter
+#sum
+station_precipitation = station_precipitation.reduceByKey(lambda a,b: a + b)
+
+station_precipitation = station_precipitation.map(lambda x: (x[0][0], x[1]))
 
 #Get max
 
