@@ -1,4 +1,3 @@
-
 from pyspark import SparkContext
 from pyspark.sql import SQLContext, Row
 from pyspark.sql import functions as F
@@ -18,7 +17,7 @@ schemaTempReadings.registerTempTable("tempReadings")
 schemaTempReadingsYear = schemaTempReadings.where(schemaTempReadings['year'] >= 1960)
 schemaTempReadingsYear = schemaTempReadingsYear.where(schemaTempReadingsYear['year'] <= 2014)
 
-schemaTempReadingsYear = schemaTempReadingsYear.groupBy('year', 'month', 'station').avg('value').orderBy(['avg(value)']
+schemaTempReadingsYear = schemaTempReadingsYear.groupBy('year', 'month', 'station').avg('value').orderBy(['station']
 from pyspark import SparkContext
 from pyspark.sql import SQLContext, Row
 from pyspark.sql import functions as F
