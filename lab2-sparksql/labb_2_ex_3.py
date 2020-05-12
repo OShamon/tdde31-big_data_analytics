@@ -17,4 +17,4 @@ schemaTempReadings.registerTempTable("tempReadings")
 schemaTempReadingsYear = schemaTempReadings.where(schemaTempReadings['year'] >= 1960)
 schemaTempReadingsYear = schemaTempReadingsYear.where(schemaTempReadingsYear['year'] <= 2014)
 
-schemaTempReadingsYear = schemaTempReadingsYear.groupBy('year', 'month', 'station').avg('value').orderBy(['station'], ascending = [1]).show(1000)                                                                                    
+schemaTempReadingsYear = schemaTempReadingsYear.groupBy('year', 'month', 'station').avg('value').orderBy(['avg(value)'], ascending = [1]).show(1000)                                                                                    
