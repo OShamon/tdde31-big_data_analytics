@@ -22,4 +22,4 @@ precipitation_readings.registerTempTable("precipitation_readings")
 precipitation_readings = precipitation_readings.where(precipitation_readings['year'] >= 1993)
 precipitation_readings = precipitation_readings.where(precipitation_readings['year'] <= 2016)
 
-precipitation_readings_OST = precipitation_readings.join(stations_Ostergotland, seq('station'), 'inner').show()
+precipitation_readings_OST = precipitation_readings.join(stations_Ostergotland, ['station'], 'inner').show()
