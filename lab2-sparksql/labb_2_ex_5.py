@@ -20,9 +20,11 @@ precipitation_readings = precipitation_readings.map(lambda x: Row(station=x[0], 
 precipitation_readings = sqlContext.createDataFrame(precipitation_readings)
 precipitation_readings.registerTempTable("precipitation_readings")
 
-precipitation_readings_OST = precipitation_readings.join(stations_Ostergotland, ['station'], 'inner').select('year', 'month', 'value')
-
+precipitation_readings_OST = precipitation_readings.join(stations_Ostergotland, ['station'], 'inner').select('year', 'month', 'value', 'station')
 precipitation_readings_OST = precipitation_readings_OST.where(precipitation_readings_OST['year'] >= 1993)
 precipitation_readings_OST = precipitation_readings_OST.where(precipitation_readings_OST['year'] <= 2016)
 
-precipitation_readings_OST = precipitation_readings_OST.groupBy('year', 'month').avg('value').orderBy(['year'], ascending = [1]).show(1000)
+
+precipitation_readings_OST = precipitation_readings_OST.groupBy('year', 'month', 'station').sum('value')
+
+precipitation_readings_OST = precipitation_readings_OST.groupBy('year', 'month').avg('sum(value)').orderBy(['year', 'month'], ascending = [1,1]).show(1000)
