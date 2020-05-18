@@ -28,7 +28,7 @@ temps = sc.textFile("data/temps.csv")
 def gaussian_kernel_dist(station_id, station_list, lon, lat, h_distance):
     for station in station_list:
         if int(station[0]) == int(station_id):
-            return exp(-((haversine(float(station[3]), float(station[4]), lon, lat)/h_distance)**2))
+            return exp(-((haversine(float(station[1][0]), float(station[1][1]), lon, lat)/h_distance)**2))
     return None
 
 def gaussian_kernel_time(time_1, time_2, h_time):
