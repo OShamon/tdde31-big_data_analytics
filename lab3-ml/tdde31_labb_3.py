@@ -34,7 +34,8 @@ def gaussian_kernel_dist(station_id, station_list, lon, lat, h_distance):
 def gaussian_kernel_time(time_1, time_2, h_time):
     h1 = int(time_1.split(":")[0])
     h2 = int(time_2.split(":")[0])
-    return exp(-((h1-h2)/h_time)**2)
+    diff = min(abs(h1 - h2), min(h1, h2) + 24 - max(h1, h2))
+    return exp(-((diff)/h_time)**2)
 
 def gaussian_kernel_date(date_1, date_2, h_date):
     d1 = int(date_1.split("-")[1])*31 + int(date_1.split("-")[2])
@@ -54,8 +55,8 @@ list_of_predictions = []
                                      
 for time in ["24:00:00", "22:00:00", "20:00:00", "18:00:00", "16:00:00", "14:00:00",
 "12:00:00", "10:00:00", "08:00:00", "06:00:00", "04:00:00"]:
-    temprature_readings = lines_temp.map(lambda x: ((x[0], x[1][0:4], x[1][5:7], x[1][8:10]), gaussian_kernel$
-    temp_readings = temprature_readings.map(lambda x: (1 , (x[1]*x[4] + x[2]*x[4] + x[3]*x[4], x[1] + x[2] + $
+    temprature_readings = lines_temp.map(lambda x: ((x[0], x[1][0:4], x[1][5:7], x[1][8:10]), gaussian_kernel_dist(x[0], stations_b.value, a, b, h_distance), gaussian_kernel_date(x[1], date, h_date), gaussian_kernel_time(x[2], time, h_time), float(x[3])))
+    temp_readings = temprature_readings.map(lambda x: (1 , (x[1]*x[4] + x[2]*x[4] + x[3]*x[4], x[1] + x[2] + x[3])))
     #temp_readings.saveAsTextFile("BDA/output")
     reduced =  temp_readings.reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
     serializzed = reduced
