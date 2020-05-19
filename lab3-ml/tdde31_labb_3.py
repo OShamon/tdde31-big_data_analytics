@@ -54,12 +54,19 @@ list_of_predictions = []
                                      
 for time in ["24:00:00", "22:00:00", "20:00:00", "18:00:00", "16:00:00", "14:00:00",
 "12:00:00", "10:00:00", "08:00:00", "06:00:00", "04:00:00"]:
-    temprature_readings = lines_temp.map(lambda x: ((x[0], x[1][0:4], x[1][5:7], x[1][8:10]), gaussian_kernel_dist(x[0], stations_b.value, a, b, h_distance), gaussian_kernel_date(x[1], date, h_date), gaussian_kernel_time(x[2], time, h_time), float(x[3])))
-    temprature_readings = temprature_readings.map(lambda x: (x[0], ((x[1][0] + x[1][1] + x[1][2])*x[1][3], (x[1][0] + x[1][1] + x[1][2])))).cache()
-    
-    reduced =  temprature_readings.reduce(lambda x: (x[1][0] + x[1][0], x[1][1] + x[1][1]))
-    
-    list_of_predictions.append(reduced.reduce(lambda x: x[0]/x[1]))
-    
+    temprature_readings = lines_temp.map(lambda x: ((x[0], x[1][0:4], x[1][5:7], x[1][8:10]), gaussian_kernel$
+    temp_readings = temprature_readings.map(lambda x: (1 , (x[1]*x[4] + x[2]*x[4] + x[3]*x[4], x[1] + x[2] + $
+    #temp_readings.saveAsTextFile("BDA/output")
+    reduced =  temp_readings.reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
+    serializzed = reduced
+    #serializzed.saveAsTextFile("BDA/output")
+    list_of_predictions.append(reduced.collect())
 
 print(list_of_predictions)
+list_of = []
+for i in list_of_predictions:
+    print(i)
+    list_of.append(i[0][1][0]/i[0][1][1])
+list_of_sc = sc.parallelize(list_of)
+
+list_of_sc.saveAsTextFile("BDA/output")
