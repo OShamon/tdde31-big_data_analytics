@@ -48,6 +48,10 @@ stations_file = sc.textFile("BDA/input/stations.csv")
 lines_temp = temperature_file.map(lambda line: line.split(";"))
 lines_station = stations_file.map(lambda line: line.split(";"))
 
+#Station number, Date, Time, temperature,  Quality
+temprature_readings_test = lines_temp.map(lambda x: (x[0], x[1], x[2], float(x[3])))
+temperature_readings_test = temperature_readings(lambda x: datetime(int(x[1][0:4]), int(x[1][5:7]), int(x[1][8:10])) <= datetime(int(date[0:4]), int(date[5:7]), int(date[8:10])))
+
 stations = lines_station.map(lambda x: (x[0], (x[3], x[4])))
 stations_b = sc.broadcast(stations.collect())
 
