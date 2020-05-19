@@ -54,12 +54,12 @@ lines_station = stations_file.map(lambda line: line.split(";"))
 stations = lines_station.map(lambda x: (x[0], (x[3], x[4])))
 stations_b = sc.broadcast(stations.collect())
 temperature_readings = lines_temp.map(lambda x: (x[0], x[1], x[2], get_lon_lat(stations_b.value, x[0]), float(x[3])))
-temperature_readings_lon_lat = temperature_readings.filter(lambda x: datetime(int(x[1][0:4]), int(x[1][5:7]), int(x[1][8:10])) <= datetime(int(date[0:4]), int(date[5:7]), int(date$
+temperature_readings_lon_lat = temperature_readings.filter(lambda x: datetime(int(x[1][0:4]), int(x[1][5:7]), int(x[1][8:10])) <= datetime(int(date[0:4]), int(date[5:7]), int(date[8:10])))
 temperature_readings_lon_lat.cache()
 
 list_of_predictions = []
 for time in ["24:00:00", "22:00:00"]: # , "20:00:00", "18:00:00", "16:00:00", "14:00:00", "12:00:00", "10:00:00", "08:00:00", "06:00:00", "04:00:00"]:
-    temprature_readings = temperature_readings_lon_lat.map(lambda x: (x[0], gaussian_kernel_dist(x[3], a, b, h_distance), gaussian_kernel_date(x[1], date, h_date), gaussian_kernel$
+    temprature_readings = temperature_readings_lon_lat.map(lambda x: (x[0], gaussian_kernel_dist(x[3], a, b, h_distance), gaussian_kernel_date(x[1], date, h_date), gaussian_kernel_time(x[2], time, h_time), float(x[4])))
     temp_readings = temprature_readings.map(lambda x: (1 , (x[1]*x[4] + x[2]*x[4] + x[3]*x[4], x[1] + x[2] + x[3])))
     #temp_readings.saveAsTextFile("BDA/output")
     reduced =  temp_readings.reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
