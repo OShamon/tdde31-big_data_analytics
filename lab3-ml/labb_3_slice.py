@@ -35,8 +35,8 @@ def gaussian_kernel_time(time_1, time_2, h_time):
     return exp(-((diff)/h_time)**2)
 
 def gaussian_kernel_date(date_1, date_2, h_date):
-    d1 = int(date_1[5:6])*31 + int(date_1[8:9])
-    d2 = int(date_2[5:6])*31 + int(date_2[8:9])
+    time = (datetime(int(date_1[0:3]), int(date_1[5:6]), int(date_1[8:9])) - datetime(int(date_2[0:3]), int(date_2[5:6]), int(date_2[8:9]))).days
+    return exp(-((time)/h_date)**2)
 
     return exp(-((d1 - d2)/h_date)**2)
 
