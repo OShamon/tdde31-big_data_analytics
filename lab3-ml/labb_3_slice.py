@@ -30,10 +30,14 @@ def gaussian_kernel_dist(lon_lat, lon, lat, h_distance):
     return exp(-((haversine(lon_lat[0], lon_lat[1], lon, lat)/h_distance)**2))
 
 def gaussian_kernel_time(time_1, time_2, h_time):
-    h1 = int(time_1[0:2])
-    h2 = int(time_2[0:2])
-    diff = min(abs(h1 - h2), min(h1, h2) + 24 - max(h1, h2))
-    return exp(-((diff)/h_time)**2)
+    #h1 = int(time_1[0:2])
+    #h2 = int(time_2[0:2])
+    #diff = min(abs(h1 - h2), min(h1, h2) + 24 - max(h1, h2))
+    print("TIME 1------->", time_1)                                                                                                                                                                                                                                                                                              print("TIME 2------->", time_2)
+    #time_diffrence = (time(int(time_1[0:2]), int(time_1[3:5]), int(time_1[6:8])) - time(int(time_2[0:2]), int(time_2[3:5]), int(time_2[6:8]))).total_seconds()
+    time_diffrence = (datetime(1995,10,17,int(time_1[0:2])) - datetime(1995, 10, 17, int(time_2[0:2])))
+    time_diffrence = time_diffrence.seconds / 3600
+    return exp(-((time_diffrence)/h_time)**2)
 
 def gaussian_kernel_date(date_1, date_2, h_date):
     date = (datetime(int(2000), int(date_1[5:7]), int(date_1[8:10])) - datetime(int(2000), int(date_2[5:7]), int(date_2[8:10]))).days
@@ -44,7 +48,9 @@ def get_lon_lat(station_list, station_id):
         if int(station[0]) == int(station_id):
             return float(station[1][0]), float(station[1][1])
 
-temperature_file = sc.textFile("BDA/input/temperature-readings.csv")                                                                                                                                                                                                                                                         stations_file = sc.textFile("BDA/input/stations.csv")                                                                                                                                                                                                                                                                        lines_temp = temperature_file.map(lambda line: line.split(";"))
+temperature_file = sc.textFile("BDA/input/temperature-readings.csv")
+stations_file = sc.textFile("BDA/input/stations.csv")
+lines_temp = temperature_file.map(lambda line: line.split(";")).sample(False, 0.1)
 lines_station = stations_file.map(lambda line: line.split(";"))
 
 stations = lines_station.map(lambda x: (x[0], (x[3], x[4])))
@@ -56,9 +62,9 @@ temperature_readings_lon_lat.cache()
 
 list_of_predictions = []
 
-for time in ["24:00:00", "22:00:00" , "20:00:00", "18:00:00", "16:00:00", "14:00:00", "12:00:00", "10:00:00", "08:00:00", "06:00:00", "04:00:00"]:
+for timeofday in ["00:00:00", "22:00:00" , "20:00:00", "18:00:00", "16:00:00", "14:00:00", "12:00:00", "10:00:00", "08:00:00", "06:00:00", "04:00:00"]:
 
-    temprature_readings = temperature_readings_lon_lat.map(lambda x: (x[0], gaussian_kernel_dist(x[3], a, b, h_distance), gaussian_kernel_date(x[1], date, h_date), gaussian_kernel_time(x[2], time, h_time), float(x[4])))
+    temprature_readings = temperature_readings_lon_lat.map(lambda x: (x[0], gaussian_kernel_dist(x[3], a, b, h_distance), gaussian_kernel_date(x[1], date, h_date), gaussian_kernel_time(x[2], timeofday, h_time), float(x[4])))
     temp_readings = temprature_readings.map(lambda x: (1 , (x[1]*x[4] + x[2]*x[4] + x[3]*x[4], x[1] + x[2] + x[3])))
 
     reduced = temp_readings.reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
@@ -66,9 +72,11 @@ for time in ["24:00:00", "22:00:00" , "20:00:00", "18:00:00", "16:00:00", "14:00
     list_of_predictions.append(reduced.collect())
 
 list_of = []
+
 for i in list_of_predictions:
     print(i)
     list_of.append(i[0][1][0]/i[0][1][1])
+
 list_of_sc = sc.parallelize(list_of)
 
-list_of_sc.saveAsTextFile("BDA/output")
+
